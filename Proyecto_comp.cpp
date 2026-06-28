@@ -2,27 +2,62 @@
 #include <string>
 #include <cstring>
 using namespace std;
-/////////////////////////////
+
 struct cadena {
-    char *contenido;   //es solo ejemplo de puntero a 
+    char *contenido = nullptr;
 };
-////////////////////////
+
+
+struct Nodo {
+    cadena dato;
+    Nodo *siguiente = nullptr;
+};
+
+// ─── Queue ───────────────────────────────────────────────────────
+struct Queue {
+    Nodo *frente = nullptr;
+    Nodo *final  = nullptr;
+};
+
+
+void guardarCadena(Queue *q, const char *texto) {
+    Nodo *nuevo = new Nodo();
+
+    nuevo->dato.contenido = new char[strlen(texto) + 1];
+    strcpy(nuevo->dato.contenido, texto);
+    nuevo->siguiente = nullptr;
+
+    if (q->final == nullptr) {
+        q->frente = nuevo;
+        q->final  = nuevo;
+    } else {
+        q->final->siguiente = nuevo;
+        q->final = nuevo;
+    }
+}
+
+
+void liberarQueue(Queue *q) {
+    while (q->frente != nullptr) {
+        Nodo *temp = q->frente;
+        q->frente  = q->frente->siguiente;
+        delete[] temp->dato.contenido;
+        delete temp;
+    }
+    q->final = nullptr;
+}
+
 int main() {
-    cadena oracion;
+    Queue q;
     string entrada;
 
     cout << "Ingresa la cadena: ";
-    getline(cin, entrada);   // Lee toda la línea completa
+    getline(cin, entrada);
 
-    // Reservar memoria dinámica exacta
-    oracion.contenido = new char[entrada.size() + 1];
-    // Copiar el contenido de string a char*
-    strcpy(oracion.contenido, entrada.c_str());
+    guardarCadena(&q, entrada.c_str());
 
-    cout << "La cadena guardada es: " << oracion.contenido << endl;
+    cout << "Cadena guardada: " << q.frente->dato.contenido << endl;
 
-    // Liberar memoria
-    delete[] oracion.contenido;
-
+    liberarQueue(&q);
     return 0;
 }
